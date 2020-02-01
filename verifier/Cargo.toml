@@ -1,0 +1,12 @@
+[package]
+name = "verifier"
+version = "0.1.0"
+authors = ["Zvonimir Rakamaric <zrakamaric@fb.com>"]
+description = "Macros that provide common software verifier primitives"
+repository = "https://github.com/zvonimir/rust-benchmarks"
+license = "MIT"
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
