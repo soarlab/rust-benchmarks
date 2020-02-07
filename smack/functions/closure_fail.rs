@@ -17,5 +17,5 @@ pub fn main() {
         add_num(5);
         call_with_one(&mut add_num);
     }
-    verifier::verifier_assert!(old_num + 6 != num); // Should be old_num + 6
+    verifier::assert!(old_num + 6 != num); // Should be old_num + 6
 }

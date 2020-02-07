@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! verifier_assume {
+macro_rules! assume {
     ($condition:expr) => {
         if cfg!(mirai) {
             mirai_annotations::mirai_assume($condition)
@@ -10,7 +10,7 @@ macro_rules! verifier_assume {
 }
 
 #[macro_export]
-macro_rules! verifier_assert {
+macro_rules! assert {
     ($condition:expr) => {
         if cfg!(mirai) {
             mirai_annotations::mirai_verify($condition, "false verification condition")
@@ -21,7 +21,7 @@ macro_rules! verifier_assert {
 }
 
 #[macro_export]
-macro_rules! verifier_assert_eq {
+macro_rules! assert_eq {
     ($left:expr, $right:expr) => (
         if cfg!(mirai) {
             mirai_annotations::mirai_verify($left == $right, concat!("false verification condition: ", stringify!($left == $right)))

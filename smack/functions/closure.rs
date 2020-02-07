@@ -17,5 +17,5 @@ pub fn main() {
         add_num(5);
         call_with_one(&mut add_num);
     }
-    verifier::verifier_assert_eq!(original_num + 6, num);
+    verifier::assert_eq!(original_num + 6, num);
 }

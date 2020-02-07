@@ -3,5 +3,5 @@
 pub fn main() {
     let a = 2;
     let b = 3;
-    verifier::verifier_assert!(b / a != 1);
+    verifier::assert!(b / a != 1);
 }
