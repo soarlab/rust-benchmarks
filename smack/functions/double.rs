@@ -1,15 +1,11 @@
-#[macro_use]
-mod smack;
-use smack::*;
-
 // @expect verified
 
 fn double(a: u32) -> u32 {
-  a * 2
+    a * 2
 }
 
-fn main() {
-  let a = 2u32.nondet();
-  let b = double(a);
-  assert!(b == 2*a);
+pub fn main() {
+    let a = 2u32.nondet();
+    let b = double(a);
+    verifier::verifier_assert!(b == 2 * a);
 }
