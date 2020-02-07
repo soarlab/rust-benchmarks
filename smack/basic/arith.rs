@@ -1,11 +1,7 @@
-#[macro_use]
-mod smack;
-use smack::*;
-
 // @expect verified
 // @flag --bit-precise
 
-fn main() {
+pub fn main() {
   // unsigned
   {
     let a: u32 = 2;
