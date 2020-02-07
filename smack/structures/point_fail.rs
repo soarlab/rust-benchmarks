@@ -35,10 +35,10 @@ impl AddAssign for Point {
 }
 
 pub fn main() {
-    let w = 1u64.nondet();
-    let x = 2u64.nondet();
-    let y = 3u64.nondet();
-    let z = 4u64.nondet();
+    let w = verifier::nondet!(1u64);
+    let x = verifier::nondet!(2u64);
+    let y = verifier::nondet!(3u64);
+    let z = verifier::nondet!(4u64);
 
     let a = Point::new(w, x);
     let b = Point::new(y, z);

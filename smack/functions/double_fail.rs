@@ -5,7 +5,7 @@ fn double(a: u32) -> u32 {
 }
 
 pub fn main() {
-    let a = 2u32.nondet();
+    let a = verifier::nondet!(2u32);
     let b = double(a);
     verifier::assert!(b != 2 * a);
 }

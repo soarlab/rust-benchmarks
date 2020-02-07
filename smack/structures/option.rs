@@ -9,7 +9,7 @@ fn safe_div(x: u64, y: u64) -> Option<u64> {
 }
 
 pub fn main() {
-    let x = 2u64.nondet();
+    let x = verifier::nondet!(2u64);
     verifier::assume!(x > 0);
     let a = safe_div(2 * x, x);
     match a {

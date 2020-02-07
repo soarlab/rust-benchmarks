@@ -39,11 +39,11 @@ fn swapem<T, U: S<T>>(s: U) -> U {
 }
 
 pub fn main() {
-    let x2 = 7i64.nondet();
-    let y2 = 8i64.nondet();
-    let x3 = 1i64.nondet();
-    let y3 = 2i64.nondet();
-    let z3 = 3i64.nondet();
+    let x2 = verifier::nondet!(7i64);
+    let y2 = verifier::nondet!(8i64);
+    let x3 = verifier::nondet!(1i64);
+    let y3 = verifier::nondet!(2i64);
+    let z3 = verifier::nondet!(3i64);
     let p2 = Point::<i64> { x: x2, y: y2 };
     let p3 = Point3::<i64> {
         x: x3,

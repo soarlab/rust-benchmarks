@@ -9,7 +9,7 @@ where
 }
 
 pub fn main() {
-    let mut num = 5i32.nondet();
+    let mut num = verifier::nondet!(5i32);
     let original_num = num;
     {
         let mut add_num = |x: i32| num += x;

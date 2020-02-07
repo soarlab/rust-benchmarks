@@ -31,3 +31,13 @@ macro_rules! assert_eq {
     );
 }
 
+#[macro_export]
+macro_rules! nondet {
+    ($value:expr) => {
+        if cfg!(mirai) {
+            mirai_annotations::mirai_abstract_value($value)
+        } else {
+            $value
+        }
+    };
+}
