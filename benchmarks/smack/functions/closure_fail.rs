@@ -10,6 +10,7 @@ where
 
 pub fn main() {
     let mut num = verifier::nondet!(5i32);
+    verifier::assume!(num <= std::i32::MAX - 5); // avoid overflow
     let old_num = num;
     {
         let mut add_num = |x: i32| num += x;
