@@ -17,8 +17,8 @@ import time
 import sys
 import shlex
 
-OVERRIDE_FIELDS = ['verifiers', 'memory', 'time-limit', 'memory-limit', 'skip']
-APPEND_FIELDS = ['flags', 'checkbpl', 'checkout']
+OVERRIDE_FIELDS = ['time-limit', 'memory-limit', 'skip']
+APPEND_FIELDS = ['flags']
 
 LANGUAGES = {'c': {'*.c'},
              'cplusplus': {'*.cpp'},
@@ -88,14 +88,6 @@ def metadata(file):
       if match:
         m['expect'] = match.group(1).strip()
 
-      match = re.search(r'@checkbpl (.*)', line)
-      if match:
-        m['checkbpl'].append(match.group(1).strip())
-
-      match = re.search(r'@checkout (.*)', line)
-      if match:
-        m['checkout'].append(match.group(1).strip())
-
   if not m['skip']:
     if not 'expect' in m:
       print(red("WARNING: @expect MISSING IN %s" % file, None))
@@ -108,7 +100,7 @@ def metadata(file):
 
 # integer constants
 PASSED = 0; TIMEDOUT = 1; UNKNOWN = 2; FAILED = -1;
-def process_test(cmd, test, memory, verifier, expect, checkbpl, checkout, log_file):
+def process_test(cmd, test, expect, log_file):
   """
   This is the worker function for each process. This function process the supplied
   test and returns a tuple containing  indicating the test results.
@@ -116,31 +108,22 @@ def process_test(cmd, test, memory, verifier, expect, checkbpl, checkout, log_fi
   :return: A tuple with the
   """
   str_result = "{0:>20}\n".format(test)
-  str_result += "{0:>20} {1:>10}    :".format(memory, verifier)
 
   t0 = time.time()
-  p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-    universal_newlines=True)
+  print(cmd)
+  try:
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+      universal_newlines=True)
+  except OSError as err:
+    print("Error during process creation: ", err)
   out, err  = p.communicate()
+  print(out)
+  print(err)
   elapsed = time.time() - t0
-  status = 0
-
-  bplfile = cmd[cmd.index('-bpl')+1]
-  with open(os.devnull, 'w') as devnull:
-    for f in checkbpl:
-      with open(bplfile) as bpl:
-        checker = subprocess.Popen(shlex.split(f), stdin=bpl, stdout=devnull, stderr=devnull)
-        checker.wait()
-        status = status or checker.returncode
-
-    for f in checkout:
-      checker = subprocess.Popen(shlex.split(f), stdin=subprocess.PIPE, stdout=devnull, stderr=devnull)
-      checker.communicate(input=out)
-      status = status or checker.returncode
 
   # get the test results
   result = get_result(out+err)
-  if result == expect and status == 0:
+  if result == expect:
     str_result += green('PASSED ', log_file)
   elif result == 'timeout':
     str_result += red('TIMEOUT', log_file)
@@ -206,7 +189,7 @@ def main():
                       help="sets the logging level (DEBUG, INFO, WARNING)")
   parser.add_argument("--output-log", action="store", dest="log_path", type=str,
                       help="sets the output log path. (std out by default)")
-  parser.add_argument("--languages", action="store", default="c", choices=list(LANGUAGES.keys()),
+  parser.add_argument("--languages", action="store", default="rust", choices=list(LANGUAGES.keys()),
                       help="Comma separated list of langauges to test. C[c],C++[cplusplus],Rust[rust]")
   args = parser.parse_args()
 
@@ -258,22 +241,13 @@ def main():
         continue
 
       # build up the subprocess command
-      cmd = ['smack', test]
-      cmd += ['--time-limit', str(meta['time-limit'])]
-      cmd += meta['flags']
-
-      for memory in meta['memory'][:100 if args.all_configs else 1]:
-        cmd += ['--mem-mod=' + memory]
-
-        for verifier in meta['verifiers'][:100 if args.all_configs else 1]:
-          name = path.splitext(path.basename(test))[0]
-          cmd += ['--verifier=' + verifier]
-          cmd += ['-bc', "%s-%s-%s.bc" % (name, memory, verifier)]
-          cmd += ['-bpl', "%s-%s-%s.bpl" % (name, memory, verifier)]
-          r = p.apply_async(process_test,
-                args=(cmd[:], test, memory, verifier, meta['expect'], meta['checkbpl'], meta['checkout'], args.log_path,),
-                callback=tally_result)
-          results.append(r)
+      cmd = '/Users/zrakamaric/.cargo/bin/mirai test.rs "-L all=/Users/zrakamaric/.rustup/toolchains/nightly-2020-01-30-x86_64-apple-darwin/lib/"'
+      #cmd = '/Users/zrakamaric/.cargo/bin/mirai ' + test + ' --extern verifier=/Users/zrakamaric/projects/rust-benchmarks/verifier/target/debug/deps/libverifier-a0e8df43af99bd6d.rlib' + ' --extern mirai_annotations=/Users/zrakamaric/projects/rust-benchmarks/verifier/target/debug/deps/libmirai_annotations-02aa2d91ba500cf6.rlib' + ''
+      name = path.splitext(path.basename(test))[0]
+      r = p.apply_async(process_test,
+            args=(cmd, test, meta['expect'], args.log_path,),
+            callback=tally_result)
+      results.append(r)
 
     # keep the main thread active while there are active workers
     for r in results:
