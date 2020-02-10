@@ -1,0 +1,6 @@
+#!/bin/zsh
+
+export DYLD_LIBRARY_PATH=/Users/zrakamaric/.rustup/toolchains/nightly-2020-01-30-x86_64-apple-darwin/lib/
+
+mirai $1 --extern verifier=/Users/zrakamaric/projects/rust-benchmarks/verifier/target/debug/deps/libverifier-a0e8df43af99bd6d.rlib --extern mirai_annotations=/Users/zrakamaric/projects/rust-benchmarks/verifier/target/debug/deps/libmirai_annotations-02aa2d91ba500cf6.rlib
+

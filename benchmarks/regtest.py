@@ -241,8 +241,7 @@ def main():
         continue
 
       # build up the subprocess command
-      cmd = '/Users/zrakamaric/.cargo/bin/mirai test.rs "-L all=/Users/zrakamaric/.rustup/toolchains/nightly-2020-01-30-x86_64-apple-darwin/lib/"'
-      #cmd = '/Users/zrakamaric/.cargo/bin/mirai ' + test + ' --extern verifier=/Users/zrakamaric/projects/rust-benchmarks/verifier/target/debug/deps/libverifier-a0e8df43af99bd6d.rlib' + ' --extern mirai_annotations=/Users/zrakamaric/projects/rust-benchmarks/verifier/target/debug/deps/libmirai_annotations-02aa2d91ba500cf6.rlib' + ''
+      cmd = ['/Users/zrakamaric/projects/rust-benchmarks/benchmarks/run-mirai', test]
       name = path.splitext(path.basename(test))[0]
       r = p.apply_async(process_test,
             args=(cmd, test, meta['expect'], args.log_path,),
