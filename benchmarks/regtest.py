@@ -42,9 +42,9 @@ def green(text, log_file):
 def get_result(output):
   if re.search(r'SMACK timed out', output):
     return 'timeout'
-  elif re.search(r'SMACK found no errors', output):
+  elif output == '':
     return 'verified'
-  elif re.search(r'SMACK found an error', output):
+  elif re.search(r'false verification condition', output):
     return 'error'
   else:
     return 'unknown'
@@ -110,15 +110,12 @@ def process_test(cmd, test, expect, log_file):
   str_result = "{0:>20}\n".format(test)
 
   t0 = time.time()
-  print(cmd)
   try:
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
       universal_newlines=True)
   except OSError as err:
     print("Error during process creation: ", err)
   out, err  = p.communicate()
-  print(out)
-  print(err)
   elapsed = time.time() - t0
 
   # get the test results
