@@ -14,12 +14,12 @@ pub fn main() {
     verifier::assume!(x <= std::u64::MAX / 2); // avoid overflow
     let a = safe_div(2 * x, x);
     match a {
-        Some(x) => verifier::assert!(x == 2),
+        Some(c) => verifier::assert!(c == 2),
         None => verifier::assert!(false),
     };
     let b = safe_div(x, 0);
     match b {
-        Some(_x) => verifier::assert!(true),
+        Some(_c) => verifier::assert!(true),
         None => verifier::assert!(false), // Division by zero should return None
     };
 }
