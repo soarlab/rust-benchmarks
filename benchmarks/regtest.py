@@ -46,6 +46,8 @@ def get_result(output):
     return 'verified'
   elif re.search(r'false verification condition', output):
     return 'error'
+  elif re.search(r'with overflow', output):
+    return 'overflow'
   else:
     return 'unknown'
 
