@@ -40,6 +40,11 @@ pub fn main() {
     let y = verifier::nondet!(3u64);
     let z = verifier::nondet!(4u64);
 
+    verifier::assume!(w <= std::u64::MAX / 2); // avoid overflow
+    verifier::assume!(x <= std::u64::MAX / 2); // avoid overflow
+    verifier::assume!(y <= std::u64::MAX / 2); // avoid overflow
+    verifier::assume!(z <= std::u64::MAX / 2); // avoid overflow
+
     let a = Point::new(w, x);
     let b = Point::new(y, z);
     let c = a + b;
