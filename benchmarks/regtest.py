@@ -95,7 +95,7 @@ def metadata(file):
       print(red("WARNING: @expect MISSING IN %s" % file, None))
       m['expect'] = 'verified'
 
-    if not m['expect'] in ['verified', 'error', 'timeout', 'unknown']:
+    if not m['expect'] in ['verified', 'error', 'overflow', 'timeout', 'unknown']:
       print(red("WARNING: unexpected @expect annotation '%s'" % m['expect'], None))
 
   return m
