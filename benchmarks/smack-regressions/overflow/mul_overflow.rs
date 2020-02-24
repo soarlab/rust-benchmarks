@@ -1,5 +1,5 @@
 // @flag --integer-overflow
-// @expect error
+// @expect overflow
 
 pub fn main() {
     let a: u8 = 128;
