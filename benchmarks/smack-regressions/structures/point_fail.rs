@@ -49,4 +49,5 @@ pub fn main() {
     let b = Point::new(y, z);
     let c = a + b;
     verifier::assert!(c != Point::new(w + y, x + z));
+    verifier::assert!(c == Point::new(a.get_x() + b.get_x(), a.get_y() + b.get_y()));
 }
