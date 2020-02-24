@@ -48,6 +48,8 @@ def get_result(output):
     return 'error'
   elif re.search(r'with overflow', output):
     return 'overflow'
+  elif re.search(r'statement is reachable', output):
+    return 'reachable'
   else:
     return 'unknown'
 
@@ -95,7 +97,7 @@ def metadata(file):
       print(red("WARNING: @expect MISSING IN %s" % file, None))
       m['expect'] = 'verified'
 
-    if not m['expect'] in ['verified', 'error', 'overflow', 'timeout', 'unknown']:
+    if not m['expect'] in ['verified', 'error', 'overflow', 'reachable', 'timeout', 'unknown']:
       print(red("WARNING: unexpected @expect annotation '%s'" % m['expect'], None))
 
   return m

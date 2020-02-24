@@ -15,11 +15,13 @@ pub fn main() {
     let a = safe_div(2 * x, x);
     match a {
         Some(c) => verifier::assert_eq!(c, 2),
-        None => verifier::assert!(false),
+        None => verifier::unreachable!(),
     };
-    let b = safe_div(x, 0);
+    let y = verifier::nondet!(2u64);
+    verifier::assume!(y > 0);
+    let b = safe_div(x, y);
     match b {
-        Some(_c) => verifier::assert!(false),
-        None => verifier::assert!(true),
+        Some(c) => verifier::assert_eq!(c, x / y),
+        None => verifier::unreachable!(), // Division by zero should return None
     };
 }

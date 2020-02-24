@@ -43,6 +43,17 @@ macro_rules! assert_ne {
 }
 
 #[macro_export]
+macro_rules! unreachable {
+    () => (
+        if cfg!(mirai) {
+            panic!("statement is reachable");
+        } else {
+            unreachable!();
+        }
+    );
+}
+
+#[macro_export]
 macro_rules! nondet {
     ($value:expr) => {
         if cfg!(mirai) {
