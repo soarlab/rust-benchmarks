@@ -3,5 +3,5 @@
 pub fn main() {
     let a = 2;
     let b = 3;
-    verifier::assert!(b * a != 6);
+    verifier::assert_ne!(b * a, 6);
 }

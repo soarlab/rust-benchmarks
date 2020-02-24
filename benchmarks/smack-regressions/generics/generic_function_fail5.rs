@@ -57,5 +57,5 @@ pub fn main() {
     verifier::assert_eq!(q2.y, x2);
     verifier::assert_eq!(q3.x, y3);
     verifier::assert_eq!(q3.y, z3);
-    verifier::assert!(q3.z != x3);
+    verifier::assert_ne!(q3.z, x3);
 }

@@ -8,5 +8,5 @@ pub fn main() {
     for i in 0..b as u64 {
         sum += i;
     }
-    verifier::assert!(2 * sum != b * (b - 1));
+    verifier::assert_ne!(2 * sum, b * (b - 1));
 }

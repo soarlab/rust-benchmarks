@@ -10,7 +10,7 @@ pub fn main() {
     verifier::assert_eq!(v[1], 1);
     verifier::assert_eq!(v[2], 3);
     v[2] = v[0] + v[1];
-    verifier::assert!(v[0] != 0);
+    verifier::assert_ne!(v[0], 0);
     verifier::assert_eq!(v[1], 1);
     verifier::assert_eq!(v[2], 1);
 }

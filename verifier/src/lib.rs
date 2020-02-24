@@ -32,6 +32,17 @@ macro_rules! assert_eq {
 }
 
 #[macro_export]
+macro_rules! assert_ne {
+    ($left:expr, $right:expr) => (
+        if cfg!(mirai) {
+            mirai_annotations::mirai_verify($left != $right, concat!("false verification condition: ", stringify!($left != $right)))
+        } else {
+            assert_ne!($left, $right);
+        }
+    );
+}
+
+#[macro_export]
 macro_rules! nondet {
     ($value:expr) => {
         if cfg!(mirai) {

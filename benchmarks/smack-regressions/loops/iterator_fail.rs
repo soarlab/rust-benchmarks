@@ -15,5 +15,5 @@ pub fn main() {
     for i in 1..n + 1 as u64 {
         a *= i;
     }
-    verifier::assert!(a != fac(n)); // a should equal 6!
+    verifier::assert_ne!(a, fac(n)); // a should equal 6!
 }
