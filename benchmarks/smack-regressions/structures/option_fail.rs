@@ -14,7 +14,7 @@ pub fn main() {
     verifier::assume!(x <= std::u64::MAX / 2); // avoid overflow
     let a = safe_div(2 * x, x);
     match a {
-        Some(c) => verifier::assert!(c == 2),
+        Some(c) => verifier::assert_eq!(c, 2),
         None => verifier::assert!(false),
     };
     let b = safe_div(x, 0);

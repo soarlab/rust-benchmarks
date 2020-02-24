@@ -11,5 +11,5 @@ fn fib(x: u64) -> u64 {
 
 pub fn main() {
     let x = fib(6);
-    verifier::assert!(x == 13);
+    verifier::assert_eq!(x, 13);
 }

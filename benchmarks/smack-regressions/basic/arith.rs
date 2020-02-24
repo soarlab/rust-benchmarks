@@ -8,27 +8,27 @@ pub fn main() {
         let b: u32 = 3;
         {
             let c = a + b;
-            verifier::assert!(c == 5);
+            verifier::assert_eq!(c, 5);
         }
         {
             let c = a * b;
-            verifier::assert!(c == 6);
+            verifier::assert_eq!(c, 6);
         }
         {
             let c = b - a;
-            verifier::assert!(c == 1);
+            verifier::assert_eq!(c, 1);
         }
         {
             let c = a % b;
-            verifier::assert!(c == 2);
+            verifier::assert_eq!(c, 2);
             let d = b % a;
-            verifier::assert!(d == 1);
+            verifier::assert_eq!(d, 1);
         }
         {
             let c = a / b;
-            verifier::assert!(c == 0);
+            verifier::assert_eq!(c, 0);
             let d = b / a;
-            verifier::assert!(d == 1);
+            verifier::assert_eq!(d, 1);
         }
     }
     // signed
@@ -37,15 +37,15 @@ pub fn main() {
         let b: i32 = 5;
         {
             let c = a + b;
-            verifier::assert!(c == 2);
+            verifier::assert_eq!(c, 2);
         }
         {
             let c = a * b;
-            verifier::assert!(c == -15);
+            verifier::assert_eq!(c, -15);
         }
         {
             let c = b - a;
-            verifier::assert!(c == 8);
+            verifier::assert_eq!(c, 8);
         }
     }
 }

@@ -53,9 +53,9 @@ pub fn main() {
 
     let q2 = swapem(p2);
     let q3 = swapem(p3);
-    verifier::assert!(q2.x == y2);
-    verifier::assert!(q2.y == x2);
-    verifier::assert!(q3.x == y3);
-    verifier::assert!(q3.y == z3);
+    verifier::assert_eq!(q2.x, y2);
+    verifier::assert_eq!(q2.y, x2);
+    verifier::assert_eq!(q3.x, y3);
+    verifier::assert_eq!(q3.y, z3);
     verifier::assert!(q3.z != x3);
 }
