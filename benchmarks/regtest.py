@@ -242,7 +242,7 @@ def main():
         continue
 
       # build up the subprocess command
-      cmd = ['/Users/zrakamaric/projects/rust-benchmarks/benchmarks/run-mirai', test]
+      cmd = ['./run-mirai', test]
       name = path.splitext(path.basename(test))[0]
       r = p.apply_async(process_test,
             args=(cmd, test, meta['expect'], args.log_path,),
