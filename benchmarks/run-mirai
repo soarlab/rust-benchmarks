@@ -1,6 +1,163 @@
-#!/bin/zsh
+#!/usr/bin/env python3
 
-export DYLD_LIBRARY_PATH=/Users/zrakamaric/.rustup/toolchains/nightly-2020-02-17-x86_64-apple-darwin/lib/
+import atexit
+import os
+import re
+import subprocess
+import sys
+import tempfile
 
-mirai $1 --extern verifier=/Users/zrakamaric/projects/rust-benchmarks/verifier/target/debug/deps/libverifier-1100ff06192add03.rlib --extern mirai_annotations=/Users/zrakamaric/projects/rust-benchmarks/verifier/target/debug/deps/libmirai_annotations-da502f6410e13cae.rlib
+# legal responses from this script
+# (to match the regtest.py script)
+status_timeout   = "SMACK timed out"
+status_verified  = None
+status_error     = "false verification condition"
+status_overflow  = "with overflow"
+status_reachable = "statement is reachable"
+status_unknown   = "unknown result" # can be any string you like
 
+# This "verifier" was used for debugging the interface to regtest.py but
+# is not used anymore.
+#
+# It cheats at verification by just looking at the filename to decide
+# what to report.
+# This was surprisingly accurate :-)
+def runtest_cheat(test):
+  status = status_verified
+  if "fail" in test: status = status_error
+  if "overflow" in test: status = status_overflow
+  return status
+
+# Verbosity control flag
+verbose = False
+
+# This verifier compiles a Rust file and uses KLEE to detect violations
+def runtest_honest(test):
+  if verbose: print(f"Verifying {test}")
+
+  # First, we have to construct a wrapper function that does some
+  # initialization and then calls main.
+  # We attach that to the end of the file being tested.
+  patched_file = tempfile.NamedTemporaryFile(suffix=".rs", dir=".", delete=False).name
+  atexit.register(os.remove, patched_file)
+  wrapper_function = '''
+
+    #[no_mangle]
+    pub extern "C" fn verifier_main() {
+        verifier::set_panic_hook();
+        main();
+    }
+
+  '''
+  concat_file(test, wrapper_function, patched_file)
+
+  if verbose: print(f"  Patching {test}")
+  # Second, we compile and link the patched file using LTO to generate the entire
+  # application in a single LLVM file
+  if verbose: print(f"  Compiling {test}")
+  llfile = tempfile.NamedTemporaryFile(suffix=".ll", dir=".", delete=False).name
+  atexit.register(os.remove, llfile)
+  status = rustc(patched_file, llfile)
+  if status is not None: return status
+
+  # Third, we run KLEE and sift through the KLEE output to generate
+  # an appropriate status string
+  if verbose: print(f"  Running KLEE to verify function")
+  status = klee(llfile, "verifier_main")
+  if status is not None: return status
+
+  # If nothing went wrong, report successful verification
+  # (But we are using symbolic execution which may not explore all paths
+  # so this really means that no bugs have been found.)
+  return status_verified
+
+def concat_file(infile, suffix, outfile):
+  with open(outfile, "w") as output_file:
+    with open(infile, "r") as input_file:
+      x = input_file.read()
+      print(x, file=output_file)
+      print(suffix, file=output_file)
+
+
+def rustc(rsfile, llfile):
+  verifier = "../verifier/target/debug/libverifier.rlib"
+  process = subprocess.Popen(['rustc',
+                              '--extern', f"verifier={verifier}",
+                              '--emit=llvm-ir',
+                              '-C', 'linker=true',
+                              '-C', 'panic=abort',
+                              '-C', 'lto',
+                              '-W', 'arithmetic-overflow',
+                              '--cfg', 'feature="verifier-klee"',
+                              '-o', llfile,
+                              rsfile],
+                             stdout=subprocess.PIPE, 
+                             stderr=subprocess.PIPE)
+  if verbose: print("    ", " ".join(process.args))
+  stdout, stderr = process.communicate()
+  if process.returncode != 0:
+    print("Couldn't compile")
+    print(process.args)
+    if verbose:
+        print(stdout.decode("utf-8"))
+        print(stderr.decode("utf-8"))
+    return status_unknown
+  return None
+
+def klee(llfile, entry):
+  process = subprocess.Popen(['klee',
+                              '--entry-point='+entry,
+                              '--exit-on-error',
+                              '--silent-klee-assume',
+                              llfile],
+                             stdout=subprocess.PIPE, 
+                             stderr=subprocess.PIPE)
+  stdout, stderr = process.communicate()
+
+  if stdout: print(stdout.decode("utf-8"))
+  for l in stderr.splitlines():
+    if l.startswith(b"KLEE: output directory"):
+      pass
+    elif l.startswith(b"KLEE: Using"):
+      pass
+    elif l.startswith(b"warning: Linking two modules of different data layouts"):
+      pass
+    elif l.startswith(b"KLEE: WARNING:"):
+      pass
+    elif l.startswith(b"KLEE: WARNING ONCE:"):
+      pass
+    elif l.startswith(b"KLEE: done:"):
+      pass
+    elif l.startswith(b"KLEE: ERROR:") and b"unreachable" in l:
+      return status_reachable
+    elif l.startswith(b"KLEE: ERROR:") and b"overflow" in l:
+      return status_overflow
+    elif l.startswith(b"KLEE: ERROR:"):
+      print(l)
+      if verbose: print(stderr.decode("utf-8"))
+      return status_error
+    elif l != b'':
+      print(l)
+      return status_unknown
+
+  if process.returncode != 0:
+    return status_unknown
+
+  return None
+
+
+def main():
+  # todo: worlds worst command line parsing!
+  if sys.argv[1] == "-v":
+    global verbose # How do I hate Python? Let me count the ways.
+    verbose = True
+    del sys.argv[1]
+    print("Verbose mode enabled")
+  test = sys.argv[1]
+
+  status = runtest_honest(test)
+  if  status: print(status)
+  exit(0) # exit status doesn't seem to be important, but use 0
+
+if __name__=="__main__":
+  main()
